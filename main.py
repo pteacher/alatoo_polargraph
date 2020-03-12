@@ -6,10 +6,9 @@ from threading import Thread
 
 import os
 
-app = Flask(__name__)
+app = Flask(__name__,  static_url_path='')
 app.secret_key = 'drawingbot'
 socketio = SocketIO(app)
-step = -1
 file_to_convert = ''
 
 UPLOAD_FOLDER = 'static/images'
@@ -30,13 +29,14 @@ class DrawThread(Thread):
     def doPrintStuff(self):
         try:
             # while True:
-            print('FINISHED CONVERTING TO SVG')
-
+            
+            '''
             print(UPLOAD_FOLDER + '/' + self.file)
-            lines = vectorise(UPLOAD_FOLDER + '/' + self.file, resolution=800, draw_contours=True, contour_simplify=1)
+            lines = vectorise(UPLOAD_FOLDER + '/' + self.file, resolution=800, draw_contours=True, contour_simplify=3)
             print('FINISHED CONVERTING TO SVG')
+            '''
 
-            os.system('gcodeplot/gcodeplot.py ' + UPLOAD_FOLDER + '/' + self.file + '.svg > 5.ngc')
+            os.system('gcodeplot/gcodeplot.py ' + UPLOAD_FOLDER + '/' + self.file + ' > 5.ngc')
             print('FINISHED CONVERTING TO GCODE')
 
             os.system('python serial_read.py')
@@ -63,9 +63,17 @@ def handle_send(data):
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
-    
     if request.method == 'POST':
+        f = open(UPLOAD_FOLDER + "/2.svg", "w+")
+        data = request.form['svg']
+        f.write(data)
+        f.close()
+        global thread
+        thread = DrawThread()
+        thread.file = "2.svg"
+        thread.start()
         # check if the post request has the file part
+        '''
         if 'file' not in request.files:
             flash('No file part')
             return redirect(request.url)
@@ -77,7 +85,6 @@ def upload_file():
             flash('No selected file')
             return redirect(request.url)
         if file and allowed_file(file.filename):
-            print("sdf")
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             file_to_convert = filename
@@ -85,9 +92,10 @@ def upload_file():
             thread = DrawThread()
             thread.file = file_to_convert
             thread.start()
+        '''
 
-
-    return '''
+    return render_template("home.html")
+    '''
     <!doctype html>
     <title>Upload new File</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
