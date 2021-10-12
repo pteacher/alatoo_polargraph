@@ -10,7 +10,7 @@ itsdangerous==1.1.0
 Jinja2==2.10.3
 MarkupSafe==1.1.1
 numpy==1.13.1
-opencv-contrib-python==3.4.4.19
+opencv-contrib-python==3.4.7.28
 picamera==1.13
 Pillow==6.2.1
 pkg-resources==0.0.0
